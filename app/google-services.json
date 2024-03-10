@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "483751385803",
+    "project_id": "android-kanban-305d6",
+    "storage_bucket": "android-kanban-305d6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483751385803:android:29eea65dcc784550b7594e",
+        "android_client_info": {
+          "package_name": "com.example.kanban_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP1AVXDbuynsHtBd6HfwQagFxp0P6DMrM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
