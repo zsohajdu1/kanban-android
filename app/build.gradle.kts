@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -64,10 +66,15 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
+
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
+    testImplementation("junit:junit:4.13")
+    testImplementation("org.mockito:mockito-core:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("io.mockk:mockk:1.13.11")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     // Optional - Integration with activities
     implementation("androidx.activity:activity-compose:1.8.2")
     // Optional - Integration with ViewModels
@@ -79,6 +86,9 @@ dependencies {
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+
+
+    implementation ("com.google.code.gson:gson:2.9.1")
 
     // hilt
     implementation("com.google.dagger:hilt-android:2.51")
@@ -94,6 +104,8 @@ dependencies {
 
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
     // When using the BoM, don't specify versions in Firebase dependencies
     // https://firebase.google.com/docs/android/setup#available-libraries
     implementation(libs.androidx.core.ktx)

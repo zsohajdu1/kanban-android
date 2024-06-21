@@ -1,6 +1,8 @@
 package com.example.kanban_android.domain.services.impl
 
 import com.example.kanban_android.domain.model.User
+import com.example.kanban_android.domain.repositories.USERS
+import com.example.kanban_android.domain.repositories.USERS_WORKSPACES
 import com.example.kanban_android.domain.services.base.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,38 +22,57 @@ class AuthServiceImpl @Inject constructor(
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser?.let { User(it.email, it.uid) } ?: User())
+                    this.trySend(auth.currentUser?.let {
+                        it.email?.let { it1 ->
+                            User(
+                                it1,
+                                it.uid
+                            )
+                        }
+                    } ?: User())
                 }
             firebaseAuth.addAuthStateListener(listener)
             awaitClose { firebaseAuth.removeAuthStateListener(listener) }
         }
 
+    override suspend fun getUserByEmail(email: String): User {
+        return try {
+            val usersCollection = firebaseFirestore.collection(USERS)
+            val querySnapshot = usersCollection.whereEqualTo("email", email).get().await()
+            val userSnapshot = querySnapshot.documents.first()
+            User(
+                uid = userSnapshot.id,
+                email = userSnapshot.getString("email") ?: ""
+            )
+        } catch (e: Exception) {
+            throw Exception("User not found")
+        }
+    }
+
     override suspend fun signUp(email: String, password: String) {
         val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
         val user = authResult.user
-        user?.uid?.let {
-            val userCollection = firebaseFirestore.collection("users")
+        if (user != null) {
+            val userCollection = firebaseFirestore.collection(USERS)
             val userData = hashMapOf(
                 "email" to email
             )
-            userCollection.document(it).set(userData)
+            userCollection.document(user.uid).set(userData).await()
         }
     }
 
     override suspend fun authenticate(email: String, password: String) {
         val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()
         val user = authResult.user
-        user?.uid?.let {
-            val userCollection = firebaseFirestore.collection("users")
-            userCollection.document(it).get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (!documentSnapshot.exists()) {
-                        val userData = hashMapOf(
-                            "email" to email
-                        )
-                        userCollection.document(it).set(userData)
-                    }
-                }
+        if (user != null) {
+            val userCollection = firebaseFirestore.collection(USERS)
+            val userDoc = userCollection.document(user.uid).get().await()
+            if (!userDoc.exists()) {
+                val userData = hashMapOf(
+                    "email" to email
+                )
+                userCollection.document(user.uid).set(userData).await()
+            }
         }
     }
 
